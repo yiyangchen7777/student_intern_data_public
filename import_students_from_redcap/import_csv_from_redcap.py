@@ -5,8 +5,10 @@ import zipfile
 import shutil
 
 """
-    Usage : python import_csv_from_redcap.py <csvfile> <intake>
-    Usage : python import_csv_from_redcap.py TestStudentInternshi_DATA_LABELS_2023-06-27_1517.csv "8 - Summer 23/24"
+    Usage : python import_csv_from_redcap.py <csvfile> <intake> <zipfile>
+
+    Usage : python import_csv_from_redcap.py TestStudentInternshi_DATA_LABELS_2023-06-27_1517.csv "8 - Summer 23/24" FilesReport_AllDataAllRecordsAnd_2023-06-27_1518.zip
+
 """
 
 
