@@ -2,7 +2,15 @@ import csv
 import sqlite3
 import sys
 
-def read_csv_file(file_path):
+"""
+    Usage : python import_csv_from_redcap.py <csvfile> <intake>
+    Usage : python import_csv_from_redcap.py TestStudentInternshi_DATA_LABELS_2023-06-27_1517.csv "8 - Summer 23/24"
+"""
+
+
+
+
+def read_csv_file(file_path,intake):
     with open(file_path, 'r') as csv_file:
         reader = csv.reader(csv_file)
         header = next(reader) 
@@ -26,7 +34,6 @@ def read_csv_file(file_path):
                 summary_interest_in_projects += 'Software Engineering'
             summary_interest_in_projects = summary_interest_in_projects.rstrip(',')
 
-            intake = '7 - Semester 2 2023'
             status = '01 Received application'
             data = (
                 full_name, pronouns, email_address, mobile_number,
@@ -50,6 +57,6 @@ def insert_student_data(conn, data):
     conn.commit()
 
 # Provide the path to your CSV file
-csv_file_path = 'TestStudentInternshi_DATA_LABELS_2023-06-27_1517.csv'
-read_csv_file(csv_file_path)
-
+csv_file_path = sys.argv[1]
+intake = sys.argv[2]
+read_csv_file(csv_file_path,intake)
