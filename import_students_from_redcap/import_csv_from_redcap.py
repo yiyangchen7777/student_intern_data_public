@@ -2,18 +2,26 @@ import csv
 import sqlite3
 import sys
 import zipfile
-
-def extract_pdf_files(zip_file_path, output_directory):
-    with zipfile.ZipFile(zip_file_path, 'r') as zip_ref:
-        for file_info in zip_ref.infolist():
-            if file_info.filename.endswith('.pdf'):
-                extracted_path = zip_ref.extract(file_info, output_directory)
-                print(extracted_path)
+import shutil
 
 """
     Usage : python import_csv_from_redcap.py <csvfile> <intake>
     Usage : python import_csv_from_redcap.py TestStudentInternshi_DATA_LABELS_2023-06-27_1517.csv "8 - Summer 23/24"
 """
+
+
+def extract_pdf_files(zip_file_path, students_inserted, output_directory):
+    with zipfile.ZipFile(zip_file_path, 'r') as zip_ref:
+        for file_info in zip_ref.infolist():
+            if file_info.filename.endswith('.pdf'):
+                extracted_path = zip_ref.extract(file_info, output_directory)
+                split_text = extracted_path.split("/")
+                last_element = split_text[-1]
+                print(last_element)
+                final_file_name = students_inserted[last_element]
+                destination_path = '../attachments/'+ final_file_name
+                shutil.move(extracted_path, destination_path)
+
 
 
 
@@ -26,10 +34,9 @@ def read_csv_file(file_path,intake,zip_file_path):
         # Provide the path to the zip file and the output directory
         output_directory = '.'
 
-        # Call the function to extract the PDF files
-        extract_pdf_files(zip_file_path, output_directory)
 
         conn = sqlite3.connect('../student_intern_data.db')
+        students_inserted = {}
 
         for row in reader:
             redcap_id = row[0]
@@ -40,7 +47,6 @@ def read_csv_file(file_path,intake,zip_file_path):
             faculty_info = row[13]
             course_name = row[14]
             
-            print(redcap_id)
 
             summary_interest_in_projects = ''
             if row[15] == 'Checked':
@@ -56,8 +62,14 @@ def read_csv_file(file_path,intake,zip_file_path):
                 full_name, pronouns, email_address, mobile_number,
                 faculty_info, course_name, summary_interest_in_projects, intake, status
             )
-            print(data)
-            insert_student_data(conn, data)
+            intern_id = insert_student_data(conn, data)
+
+            extracted_zip_file_name = str(redcap_id)+'_fm_cletter_resume_v2.pdf' 
+            final_file_name = str(intern_id) + "_"+full_name.replace(" ", "_")+"_application.pdf"
+            students_inserted[extracted_zip_file_name] = final_file_name
+
+        # Call the function to extract the PDF files
+        extract_pdf_files(zip_file_path, students_inserted, output_directory)
 
 
 def insert_student_data(conn, data):
@@ -72,6 +84,11 @@ def insert_student_data(conn, data):
         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
     ''', data)
     conn.commit()
+
+    last_intern_id = cursor.lastrowid
+    return last_intern_id
+
+
 
 # Provide the path to your CSV file
 csv_file_path = sys.argv[1]
