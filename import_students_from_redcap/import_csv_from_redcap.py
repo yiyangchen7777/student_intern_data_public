@@ -1,6 +1,14 @@
 import csv
 import sqlite3
 import sys
+import zipfile
+
+def extract_pdf_files(zip_file_path, output_directory):
+    with zipfile.ZipFile(zip_file_path, 'r') as zip_ref:
+        for file_info in zip_ref.infolist():
+            if file_info.filename.endswith('.pdf'):
+                extracted_path = zip_ref.extract(file_info, output_directory)
+                print(extracted_path)
 
 """
     Usage : python import_csv_from_redcap.py <csvfile> <intake>
@@ -10,20 +18,29 @@ import sys
 
 
 
-def read_csv_file(file_path,intake):
+def read_csv_file(file_path,intake,zip_file_path):
     with open(file_path, 'r') as csv_file:
         reader = csv.reader(csv_file)
         header = next(reader) 
 
+        # Provide the path to the zip file and the output directory
+        output_directory = '.'
+
+        # Call the function to extract the PDF files
+        extract_pdf_files(zip_file_path, output_directory)
+
         conn = sqlite3.connect('../student_intern_data.db')
 
         for row in reader:
+            redcap_id = row[0]
             full_name = row[9]
             pronouns = row[10]
             email_address = row[11]
             mobile_number = row[12]
             faculty_info = row[13]
             course_name = row[14]
+            
+            print(redcap_id)
 
             summary_interest_in_projects = ''
             if row[15] == 'Checked':
@@ -59,4 +76,5 @@ def insert_student_data(conn, data):
 # Provide the path to your CSV file
 csv_file_path = sys.argv[1]
 intake = sys.argv[2]
-read_csv_file(csv_file_path,intake)
+zip_file_path = sys.argv[3]
+read_csv_file(csv_file_path,intake,zip_file_path)
