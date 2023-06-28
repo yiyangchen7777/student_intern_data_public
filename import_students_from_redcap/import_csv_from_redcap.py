@@ -57,6 +57,8 @@ def read_csv_file(file_path,intake,zip_file_path):
                 summary_interest_in_projects += 'Data Engineering,'
             if row[17] == 'Checked':
                 summary_interest_in_projects += 'Software Engineering'
+            if row[18] == 'Checked':
+                summary_interest_in_projects += 'Web Development'
             summary_interest_in_projects = summary_interest_in_projects.rstrip(',')
 
             status = '01 Received application'
