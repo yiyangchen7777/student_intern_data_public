@@ -62,9 +62,11 @@ def read_csv_file(file_path,intake,zip_file_path):
             summary_interest_in_projects = summary_interest_in_projects.rstrip(',')
 
             status = '01 Received application'
+            github_username = row[19]
+
             data = (
                 full_name, pronouns, email_address, mobile_number,
-                faculty_info, course_name, summary_interest_in_projects, intake, status
+                faculty_info, course_name, summary_interest_in_projects, intake, status, github_username
             )
             intern_id = insert_student_data(conn, data)
 
@@ -83,9 +85,9 @@ def insert_student_data(conn, data):
     cursor.execute('''
         INSERT INTO students (
             full_name, pronouns, email, mobile,
-            course, course_major, summary_interest_in_projects,intake, status
+            course, course_major, summary_interest_in_projects,intake, status, github_username
         )
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
     ''', data)
     conn.commit()
 
