@@ -21,8 +21,7 @@ import random
 conn = sqlite3.connect('student_intern_data.db')
 cursor = conn.cursor()
 
-
-
+cursor.execute('DELETE FROM STUDENTS')
 
 # List of projects excluding 'Unassigned'
 project_data = [
@@ -104,16 +103,12 @@ courses = ['Engineering and IT', 'Science', 'Engineering']
 def assign_project_and_intake(status):
     """Assign project and intake based on status."""
     if status in ['15 Ineligible', '15 Chose another internship', '15 Did not complete', '15 Did not reply', '15 Was not chosen', '15 Withdrew', '15 Applied after close']:
-        # If status is any of these, project and intake should be empty
         return None, None
     elif status == '14 Finished':
-        # If status is 'Finished', choose from finished_intakes and assign a project
         return random.choice(finished_intakes), random.choice(project_data)
     elif status in early_stage_statuses:
-        # If status is early stage, intake is default and project is 'Unassigned'
         return default_intake, 'Unassigned'
     else:
-        # For other statuses, assign the default intake and choose a project
         return default_intake, random.choice(project_data)
 
 for status, count in {**early_stage_statuses, **status_counts}.items():
@@ -126,7 +121,6 @@ for status, count in {**early_stage_statuses, **status_counts}.items():
                 break
         
         pronoun = random.choice(pronouns)
-        # Create email based on the student's name, using lowercase first name and last initial
         first_name, last_name = name.split()
         email = f"{first_name.lower()}{last_name[0].lower()}@{fake_domain}"
 
@@ -140,7 +134,7 @@ for status, count in {**early_stage_statuses, **status_counts}.items():
             course_major = random.choice(['Biology', 'Data Science', 'Computer Science', 'Chemistry', 'Physics'])
         elif course == 'Engineering':
             course_major = random.choice(['Course Major 1', 'Course Major 2', 'Course Major 3', 'Course Major 4', 'Course Major 5'])
-        
+
         # Check if the student already exists
         cursor.execute('''
             SELECT COUNT(*) FROM Students WHERE email = ?
@@ -148,45 +142,76 @@ for status, count in {**early_stage_statuses, **status_counts}.items():
         result = cursor.fetchone()
 
         if result[0] == 0:
-            # If student doesn't exist, insert the student with all randomly generated data
             intake, project = assign_project_and_intake(status)
-            # Randomly assign values for the additional columns
             remote_internship = random.choice(remote_internship_options)
             facilitator_follower = random.choice(facilitator_follower_options)
             listener_or_talker = random.choice(listener_or_talker_options)
             thinker_brainstormer = random.choice(thinker_brainstormer_options)
             projects_recommended = random.choice(project_data)
+
+            # Debugging info for inserted student
+            print(f"Inserting {name}, {status}, {email}")
+
             cursor.execute('''
                 INSERT INTO Students (
                     full_name, pronouns, status, email, mobile, course, course_major, intake, project,
                     remote_internship, facilitator_follower, listener_or_talker, thinker_brainstormer, projects_recommended
                 ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-            ''', (name, pronoun, status, email, mobile, course, course_major, intake, project, remote_internship, facilitator_follower, listener_or_talker, thinker_brainstormer, projects_recommended))
+            ''', (name, pronoun, status, email, mobile, course, course_major, intake, project, 
+                  remote_internship, facilitator_follower, listener_or_talker, thinker_brainstormer, projects_recommended))
 
-# Update status == '15 Withdrew' to assign random intake from finished_intakes
-cursor.execute('''
+# Update specific status conditions with additional logging
+status_conditions = [
+    '15 Ineligible',
+    '15 Chose another internship',
+    '15 Did not complete',
+    '15 Did not reply',
+    '15 Was not chosen',
+    '15 Withdrew',
+    '15 Applied after close'
+]
+
+# Format the status conditions into a string for the SQL query
+status_condition_string = "', '".join(status_conditions)
+
+# Execute the update query
+cursor.execute(f'''
     UPDATE Students 
     SET intake = ? 
-    WHERE status = '15 Withdrew'
-''', (random.choice(finished_intakes),))
+    WHERE status IN ('{status_condition_string}')
+''', (default_intake,))
 
-# For status == '07 Offered contact', '08 Accepted contract', '09 Signed contract', assign random projects
+print(f"Updated students with statuses: {', '.join(status_conditions)}.")
+
+# Fetch all students with the specified statuses
 cursor.execute('''
-    UPDATE Students 
-    SET project = ? 
+    SELECT intern_id FROM Students 
     WHERE status IN ('07 Offered contact', '08 Accepted contract', '09 Signed contract')
-''', (random.choice(project_data),))
+''')
+students = cursor.fetchall()
 
-# For status == '12 WEHI email created', set intake to '11 - Summer 2024/2025'
+# Update each student with a random project
+for student in students:
+    random_project = random.choice(project_data)
+    cursor.execute('''
+        UPDATE Students 
+        SET project = ? 
+        WHERE intern_id = ?
+    ''', (random_project, student[0]))
+
+print("Updated projects for students with statuses: '07 Offered contact', '08 Accepted contract', '09 Signed contract'.")
+
+
 cursor.execute('''
     UPDATE Students 
     SET intake = '11 - Summer 2024/2025' 
     WHERE status = '12 WEHI email created'
 ''')
-
+print("Updated intake for '12 WEHI email created'.")
 
 # Commit changes and close the connection
 conn.commit()
 conn.close()
 
 print("Data has been inserted or updated in the database.")
+
