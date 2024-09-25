@@ -23,13 +23,14 @@
 -- This script upgrades the database schema to include new fields in the Students and Intakes tables.
 
 -- Adding new columns to the Students table
-ALTER TABLE Students ADD COLUMN remote_internship TEXT; -- Added to capture if the internship is remote
+ALTER TABLE Students ADD COLUMN remote_internship TEXT; -- Added to capture if the internship is remote (yes/no)
 ALTER TABLE Students ADD COLUMN code_of_conduct TEXT; -- Added to store information about code of conduct agreement
-ALTER TABLE Students ADD COLUMN facilitator_follower TEXT; -- Added to indicate if the student is a facilitator or follower
-ALTER TABLE Students ADD COLUMN listener_or_talker TEXT; -- Added to categorise the student as a listener or talker
-ALTER TABLE Students ADD COLUMN thinker_brainstormer TEXT; -- Added to identify if the student is a thinker or brainstormer
+ALTER TABLE Students ADD COLUMN facilitator_follower TEXT; -- Added to indicate if the student is a facilitator or follower (facilitator/follower)
+ALTER TABLE Students ADD COLUMN listener_or_talker TEXT; -- Added to categorise the student as a listener or talker (listener/talker)
+ALTER TABLE Students ADD COLUMN thinker_brainstormer TEXT; -- Added to identify if the student is a thinker or brainstormer (thinker/brainstormer)
 ALTER TABLE Students ADD COLUMN why_applied TEXT; -- Added to store reasons why the student applied
-ALTER TABLE Students ADD COLUMN projects_recommended TEXT; -- Added to capture projects recommended to the student
+ALTER TABLE Students ADD COLUMN projects_recommended TEXT; -- Added to capture projects recommended to the student (random projects) 
+projects)
 
 -- Adding new columns to the Intakes table
 ALTER TABLE Intakes ADD COLUMN science_start_date DATE; -- Added to track the start date for science intakes

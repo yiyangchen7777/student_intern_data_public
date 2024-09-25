@@ -1,3 +1,16 @@
+'''
+The update_intake.py aims to update the INTAKE table in student_intern_data.db
+
+We add new intake data to keep the information up-to-date
+
+Change the status of previous intake from 'no' to 'finished'
+
+For further updates, simply add new intakes and status to the intakes_data list
+
+Author: [Yiyang Chen]
+Date: [Sep, 2024]
+'''
+
 import sqlite3
 
 # Connect to the SQLite database

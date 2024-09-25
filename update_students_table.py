@@ -1,3 +1,19 @@
+'''
+The update_students_table.py renew the student information based on the original database student_intern_data.db
+
+Changes:
+1. New columns are added, see details in upgrade_database_2024_semester_2.sql created by @Yovela Budiman
+
+2. Create fake students and all revelent information
+
+3. We assign each student with their 'intake' information
+
+4. For our new columns 'remote_internship', 'facilitator_follower', 'listener_or_talker', 'thinker_brainstormer', 'projects_recommended',
+   we assign corresponding data 
+   
+Author: [Yiyang Chen]
+Date: [Sep, 2024]
+'''
 import sqlite3
 import random
 
@@ -5,67 +21,8 @@ import random
 conn = sqlite3.connect('student_intern_data.db')
 cursor = conn.cursor()
 
-# Step 1: Delete all existing rows from the Students table
-cursor.execute('DELETE FROM Students')
 
-# student table 
-cursor.execute('''
-    CREATE TABLE IF NOT EXISTS Students (
-        intern_id INTEGER PRIMARY KEY AUTOINCREMENT,
-        full_name TEXT,
-        pronouns TEXT,
-        status TEXT,
-        email TEXT,
-        mobile TEXT,
-        course TEXT,            
-        course_major TEXT,
-        link_to_application_doc TEXT,
-        read_student_handbook TEXT,
-        read_student_projects TEXT,
-        cover_letter_projects TEXT,
-        cover_letter_concept TEXT,
-        cover_letter_technical TEXT,
-        pronunciation TEXT,
-        project TEXT,
-        start_date DATE,
-        end_date DATE,
-        hours_per_week INTEGER,
-        intake TEXT,    
-        supervisor_email TEXT,
-        wehi_email TEXT,
-        summary_tech_skills TEXT,
-        summary_experience TEXT,
-        summary_interest_in_projects TEXT,
-        pre_internship_summary_recommendation_external TEXT,
-        pre_internship_summary_recommendation_internal TEXT,
-        pre_internship_technical_rating TEXT,
-        pre_internship_social_rating TEXT,
-        pre_internship_learning_quickly TEXT,
-        pre_internship_enthusiasm TEXT,
-        pre_internship_experience TEXT,
-        pre_internship_communication TEXT,
-        pre_internship_adaptable TEXT,
-        pre_internship_problem_solver TEXT,
-        post_internship_comments TEXT,
-        post_internship_adaptability TEXT,
-        post_internship_learn_technical TEXT,
-        post_internship_learn_conceptual TEXT,
-        post_internship_collaborative TEXT,
-        post_internship_ambiguity TEXT,
-        post_internship_complexity TEXT,
-        post_internship_summary_rating_internal TEXT,
-        post_internship_summary_rating_external TEXT,
-        github_username TEXT,
-        extra_notes TEXT,
-        remote_internship TEXT,
-        code_of_conduct TEXT,
-        facilitator_follower TEXT,
-        listener_or_talker TEXT,
-        thinker_brainstormer TEXT,
-        why_applied TEXT,
-        projects_recommended TEXT
-    )
-''')
+
 
 # List of projects excluding 'Unassigned'
 project_data = [
@@ -123,7 +80,15 @@ finished_intakes = [
     '8 - Summer 2023/2024',
     '9 - Semester 1 2024'
 ]
+
+# Current intake
 default_intake = '10 - Semester 2 2024'
+
+# Values for the additional columns
+remote_internship_options = ['yes', 'no']
+facilitator_follower_options = ['facilitator', 'follower']
+listener_or_talker_options = ['listener', 'talker']
+thinker_brainstormer_options = ['thinker', 'brainstormer']
 
 # Handle names and basic details
 first_names = ['John', 'Jane', 'Alice', 'Bob', 'Charlie', 'Dana', 'Evan', 'Fiona', 'Grace', 'Hank', 'Ivy', 'Jack', 'Karen', 'Leo', 'Mia', 'Nina', 'Oscar', 'Paul', 'Quincy', 'Rachel']
@@ -185,12 +150,19 @@ for status, count in {**early_stage_statuses, **status_counts}.items():
         if result[0] == 0:
             # If student doesn't exist, insert the student with all randomly generated data
             intake, project = assign_project_and_intake(status)
+            # Randomly assign values for the additional columns
+            remote_internship = random.choice(remote_internship_options)
+            facilitator_follower = random.choice(facilitator_follower_options)
+            listener_or_talker = random.choice(listener_or_talker_options)
+            thinker_brainstormer = random.choice(thinker_brainstormer_options)
+            projects_recommended = random.choice(project_data)
             cursor.execute('''
                 INSERT INTO Students (
-                    full_name, pronouns, status, email, mobile, course, course_major, intake, project
-                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
-            ''', (name, pronoun, status, email, mobile, course, course_major, intake, project))
-            
+                    full_name, pronouns, status, email, mobile, course, course_major, intake, project,
+                    remote_internship, facilitator_follower, listener_or_talker, thinker_brainstormer, projects_recommended
+                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+            ''', (name, pronoun, status, email, mobile, course, course_major, intake, project, remote_internship, facilitator_follower, listener_or_talker, thinker_brainstormer, projects_recommended))
+
 # Update status == '15 Withdrew' to assign random intake from finished_intakes
 cursor.execute('''
     UPDATE Students 
@@ -211,6 +183,7 @@ cursor.execute('''
     SET intake = '11 - Summer 2024/2025' 
     WHERE status = '12 WEHI email created'
 ''')
+
 
 # Commit changes and close the connection
 conn.commit()
