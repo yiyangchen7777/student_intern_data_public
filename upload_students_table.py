@@ -190,6 +190,27 @@ for status, count in {**early_stage_statuses, **status_counts}.items():
                     full_name, pronouns, status, email, mobile, course, course_major, intake, project
                 ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
             ''', (name, pronoun, status, email, mobile, course, course_major, intake, project))
+            
+# Update status == '15 Withdrew' to assign random intake from finished_intakes
+cursor.execute('''
+    UPDATE Students 
+    SET intake = ? 
+    WHERE status = '15 Withdrew'
+''', (random.choice(finished_intakes),))
+
+# For status == '07 Offered contact', '08 Accepted contract', '09 Signed contract', assign random projects
+cursor.execute('''
+    UPDATE Students 
+    SET project = ? 
+    WHERE status IN ('07 Offered contact', '08 Accepted contract', '09 Signed contract')
+''', (random.choice(project_data),))
+
+# For status == '12 WEHI email created', set intake to '11 - Summer 2024/2025'
+cursor.execute('''
+    UPDATE Students 
+    SET intake = '11 - Summer 2024/2025' 
+    WHERE status = '12 WEHI email created'
+''')
 
 # Commit changes and close the connection
 conn.commit()

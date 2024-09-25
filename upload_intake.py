@@ -9,15 +9,15 @@ cursor.execute('DELETE FROM Intakes')
 
 # Step 2: Insert new rows into the Intakes table
 intakes_data = [
-    ('1 - Semester 2 2021', 'finish'),
-    ('2 - Summer 2021/2022', 'finish'),
-    ('3 - Semester 1 2022', 'finish'),
-    ('4 - Semester 2 2022', 'finish'),
-    ('5 - Summer 2022/2023', 'finish'),
-    ('6 - Semester 1 2023', 'finish'),
-    ('7 - Semester 2 2023', 'finish'),
-    ('8 - Summer 2023/2024', 'finish'),
-    ('9 - Semester 1 2024', 'finish'),
+    ('1 - Semester 2 2021', 'finished'),
+    ('2 - Summer 2021/2022', 'finished'),
+    ('3 - Semester 1 2022', 'finished'),
+    ('4 - Semester 2 2022', 'finished'),
+    ('5 - Summer 2022/2023', 'finished'),
+    ('6 - Semester 1 2023', 'finished'),
+    ('7 - Semester 2 2023', 'finished'),
+    ('8 - Summer 2023/2024', 'finished'),
+    ('9 - Semester 1 2024', 'finished'),
     ('10 - Semester 2 2024', 'current'),
     ('11 - Summer 2024/2025', 'new')
 ]
