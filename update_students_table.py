@@ -18,7 +18,7 @@ import sqlite3
 import random
 
 # Connect to the SQLite database
-conn = sqlite3.connect('student_intern_data.db')
+conn = sqlite3.connect('student_intern_data_public/student_intern_data.db')
 cursor = conn.cursor()
 
 cursor.execute('DELETE FROM STUDENTS')
@@ -186,7 +186,7 @@ print(f"Updated students with statuses: {', '.join(status_conditions)}.")
 # Fetch all students with the specified statuses
 cursor.execute('''
     SELECT intern_id FROM Students 
-    WHERE status IN ('07 Offered contact', '08 Accepted contract', '09 Signed contract')
+    WHERE status IN ('07 Offered contact', '08 Accepted contract', '09 Signed contract', '15 Withdrew')
 ''')
 students = cursor.fetchall()
 
@@ -205,9 +205,12 @@ print("Updated projects for students with statuses: '07 Offered contact', '08 Ac
 cursor.execute('''
     UPDATE Students 
     SET intake = '11 - Summer 2024/2025' 
-    WHERE status = '12 WEHI email created'
+    WHERE status IN ('01 Received application', '02 Emailed acknowledgement', '03 Quick review', '04 Initial phone call',
+                     '05 Added to Round 2 list', '06 Interviewed by non-RCP supervisor', '07 Offered contact', 
+                     '08 Accepted contract', '09 Signed contract', '10 Sent to be added to Workday', 
+                     '11 Added to WEHI-wide Teams Group', '12 WEHI email created')
 ''')
-print("Updated intake for '12 WEHI email created'.")
+print("Updated intake for statuses from '01' to '12'.")
 
 # Commit changes and close the connection
 conn.commit()
